@@ -20,11 +20,7 @@ router.post('/add', async function(req, res, next) {
         const result = await addItemToCart(sessionId, productId, quantity);
         res.json(result);
     } catch (error) {
-        console.error('Error adding to cart:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to add item to cart' 
-        });
+        next(error);
     }
 });
 
@@ -43,11 +39,7 @@ router.get('/:sessionId', async function(req, res, next) {
         const cart = await getCart(sessionId);
         res.json(cart);
     } catch (error) {
-        console.error('Error getting cart:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to get cart contents' 
-        });
+        next(error);
     }
 });
 
@@ -59,11 +51,7 @@ router.delete('/:sessionId/:productId', async function(req, res, next) {
         const result = await removeItemFromCart(sessionId, productId);
         res.json(result);
     } catch (error) {
-        console.error('Error removing from cart:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to remove item from cart' 
-        });
+        next(error);
     }
 });
 
@@ -75,11 +63,7 @@ router.delete('/:sessionId', async function(req, res, next) {
         const result = await clearCart(sessionId);
         res.json(result);
     } catch (error) {
-        console.error('Error clearing cart:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to clear cart' 
-        });
+        next(error);
     }
 });
 

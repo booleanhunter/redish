@@ -23,11 +23,7 @@ router.get('/:productId', async function(req, res, next) {
             product: product
         });
     } catch (error) {
-        console.error('Error getting product:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to get product details' 
-        });
+        next(error);
     }
 });
 

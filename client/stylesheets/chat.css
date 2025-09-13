@@ -15,7 +15,7 @@
     --brutal-light: #FAFAFA;
     --brutal-white: #FFFFFF;
     --brutal-border: 3px solid #163342;
-    --brutal-shadow: 4px 4px 0px 0px #163342;
+    --brutal-shadow: 2px 2px 0px 0px #163342;
     --brutal-shadow-hover: 6px 6px 0px 0px #163342;
     --brutal-shadow-active: 2px 2px 0px 0px #163342;
 }
@@ -47,7 +47,6 @@ body {
 .brutal-header {
     background: var(--brutal-white);
     border-bottom: var(--brutal-border);
-    box-shadow: var(--brutal-shadow);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -187,7 +186,6 @@ body {
 .brutal-hero-section {
     background: var(--brutal-white);
     border-bottom: var(--brutal-border);
-    box-shadow: var(--brutal-shadow);
     padding: 3rem 2rem;
     text-align: center;
     margin-bottom: 2rem;
@@ -234,15 +232,8 @@ body {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: var(--brutal-shadow);
+    /* box-shadow: var(--brutal-shadow); */
     transition: all 0.1s ease;
-}
-
-.brutal-feature:hover {
-    background: var(--brutal-info);
-    color: var(--brutal-dark);
-    box-shadow: var(--brutal-shadow-hover);
-    transform: translate(-2px, -2px);
 }
 
 /* Categories Section */
@@ -647,7 +638,7 @@ body {
     font-weight: 700;
     font-size: 1rem;
     color: var(--brutal-primary);
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     letter-spacing: 0.5px;
 }
 
@@ -828,6 +819,7 @@ body {
     color: var(--brutal-white);
     border: var(--brutal-border);
     box-shadow: var(--brutal-shadow);
+    padding: 1rem;
 }
 
 .assistant-content {
@@ -886,19 +878,6 @@ body {
     align-items: center;
     gap: 0.5rem;
     box-shadow: var(--brutal-shadow);
-}
-
-.smart-recall-toggle {
-    color: var(--brutal-primary);
-    text-decoration: underline;
-    cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.smart-recall-toggle:hover {
-    color: var(--brutal-secondary);
 }
 
 .message-time {

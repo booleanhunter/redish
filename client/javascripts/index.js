@@ -180,9 +180,8 @@ class ShoppingChatApp {
             const cacheIndicator = isCached ? `
                 <div class="cache-notice">
                     <i class="fas fa-clock"></i>
-                    <span>⏱️ ${responseTime?.toFixed(3) || '0.000'}s</span>
-                    Using a previous answer to save time. 
-                    <span class="smart-recall-toggle">Turn off Smart Recall if you'd prefer a fresh response.</span>
+                    <span>${responseTime?.toFixed(3) || '0.000'}s</span>
+                    Served using Redis LangCache. <br> Turn off Smart Recall if you'd prefer a fresh response.</span>
                 </div>
             ` : '';
             
@@ -202,20 +201,6 @@ class ShoppingChatApp {
         // Attach product interactions for assistant messages
         if (sender === 'assistant') {
             this.attachProductInteractions(messageDiv);
-        }
-        
-        // Add click handler for smart recall toggle
-        if (isCached) {
-            const toggleLink = messageDiv.querySelector('.smart-recall-toggle');
-            if (toggleLink) {
-                toggleLink.addEventListener('click', () => {
-                    const memoryToggle = document.getElementById('memory-toggle');
-                    if (memoryToggle) {
-                        memoryToggle.checked = false;
-                        this.showNotification('Smart Recall turned off! 🔄');
-                    }
-                });
-            }
         }
     }
 

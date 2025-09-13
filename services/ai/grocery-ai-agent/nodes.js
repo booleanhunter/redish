@@ -2,10 +2,8 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { AIMessage } from "@langchain/core/messages";
 import { groceryTools } from "./tools.js";
-import ChatRepository from "../../chat/data/chat-repository.js";
+import { checkSemanticCache, saveToSemanticCache } from "../../chat/domain/chat-service.js";
 import CONFIG from "../../../config.js";
-
-const chatRepository = new ChatRepository();
 
 /**
  * Grocery Shopping Agent Node
@@ -22,7 +20,7 @@ export const groceryShoppingAgent = async (state) => {
     // Enhanced system prompt with clear tool usage guidelines
     const systemPrompt = `You are a helpful grocery shopping assistant. You have access to specialized tools that return JSON data.
 
-🍳 **fastRecipeIngredientsTool**: For recipe/ingredient questions (USE THIS FIRST for recipes!)
+🍳 **fast_recipe_ingredients**: For recipe/ingredient questions (USE THIS FIRST for recipes!)
 - Use when user asks "ingredients for [recipe]" or "what do I need to make [dish]"
 - Returns ingredient list with ONE suggested product each for SPEED
 - Much faster than searching for each ingredient separately
@@ -30,27 +28,29 @@ export const groceryShoppingAgent = async (state) => {
 - Always offer: "Want more options for any ingredient? Just ask!"
 - Example: "ingredients for butter chicken" → Use this tool!
 
-🔍 **searchProductsTool**: For specific product searches and follow-ups
+🔍 **search_products**: For specific product searches and follow-ups
 - Use when user wants to "find [specific item]" or "show me [products]"
 - Use when user asks for "more options" or "more brands" after recipe ingredients
 - Returns products with cart icons and product page links
 - Format: Show products with "🛒 Add to Cart" and "👁️ View Details" options
 
 🛒 **Cart Tools**: For cart management
-- addToCartTool: Add products by ID (parse JSON response)
-- viewCartTool: Show cart contents with totals
-- clearCartTool: Empty the cart
+- add_to_cart: Add products by ID (parse JSON response)
+- view_cart: Show cart contents with totals
+- clear_cart: Empty the cart
 
-🧠 **directAnswerTool**: For general cooking/food knowledge
+🧠 **direct_answer**: For general cooking/food knowledge
 - Cooking tips, techniques, nutrition advice
 - Food storage, preparation methods
 - General culinary knowledge (not recipe ingredients!)
 
+
+
 **CRITICAL Tool Selection Rules:**
-1. Recipe/ingredient questions → ALWAYS use fastRecipeIngredientsTool FIRST
-2. "More options" requests → searchProductsTool
+1. Recipe/ingredient questions → ALWAYS use fast_recipe_ingredients FIRST
+2. "More options" requests → search_products
 3. Cart operations → appropriate cart tool
-4. General cooking tips → directAnswerTool
+4. General cooking tips → direct_answer
 
 **Response Formatting Rules:**
 1. Parse ALL JSON tool responses before presenting to user
@@ -158,8 +158,8 @@ export const groceryCacheCheck = async (state) => {
     console.log(`🔍 Checking semantic cache for: "${userQuery.substring(0, 50)}..."`);
     
     try {
-        const cachedResult = await chatRepository.findFromSemanticCache(state.sessionId, userQuery);
-        
+        const cachedResult = await checkSemanticCache(userQuery);
+
         if (cachedResult) {
             console.log("🎯 Semantic cache HIT - returning previous response");
             return {
@@ -178,7 +178,7 @@ export const groceryCacheCheck = async (state) => {
         
     } catch (error) {
         console.error("Error checking semantic cache:", error);
-        return { 
+        return {
             cacheStatus: "miss",
             sessionId: state.sessionId
         };
@@ -186,50 +186,126 @@ export const groceryCacheCheck = async (state) => {
 };
 
 /**
- * Save Grocery Results to Cache
+ * LLM-based GDPR-compliant data sanitization
+ * Uses AI to intelligently remove personal information while preserving the core query
+ */
+async function sanitizeForGDPR(text) {
+    if (!text || typeof text !== 'string') return text;
+
+    try {
+        const model = new ChatOpenAI({
+            temperature: 0,
+            model: CONFIG.modelName,
+            apiKey: CONFIG.openAiApiKey
+        });
+
+        const sanitizationPrompt = `You are a GDPR compliance assistant. Your task is to remove or anonymize any personal information from the given text while preserving the core meaning and context.
+
+Remove or replace the following types of personal information:
+- Names (first names, last names, usernames)
+- Email addresses
+- Phone numbers
+- Addresses (street addresses, zip codes)
+- Credit card numbers, SSNs, or other ID numbers
+- Any other personally identifiable information
+
+IMPORTANT: Keep all food-related terms, product IDs, grocery items, cooking terms, brand names, and the core question intact. Only remove personal identifiers.
+
+Examples:
+- "Hi, my name is John, I want butter chicken ingredients" → "I want butter chicken ingredients"
+- "I'm Sarah and I live at 123 Main St, what's good for pasta?" → "what's good for pasta?"
+- "My email is test@email.com, show me organic apples" → "show me organic apples"
+
+Text to sanitize: "${text}"
+
+Return only the sanitized text with no additional explanation:`;
+
+        const response = await model.invoke(sanitizationPrompt);
+        return response.content.trim();
+
+    } catch (error) {
+        console.error('Error in LLM sanitization, using original text:', error);
+        return text; // Fallback to original text if LLM fails
+    }
+}
+
+/**
+ * Determine cache TTL based on query type
+ */
+function determineCacheTTL(query) {
+    if (!query || typeof query !== 'string') {
+        return 6 * 60 * 60 * 1000; // 6 hours default
+    }
+
+    const lowerQuery = query.toLowerCase();
+
+    // Don't cache cart operations (they're user-specific and dynamic)
+    if (lowerQuery.includes('cart') ||
+        lowerQuery.includes('add to') ||
+        lowerQuery.includes('remove')) {
+        return 0; // Don't cache
+    }
+
+    // Longer TTL for recipe/ingredient queries (they don't change often)
+    if (lowerQuery.includes('recipe') ||
+        lowerQuery.includes('ingredients') ||
+        lowerQuery.includes('how to make') ||
+        lowerQuery.includes('need for') ||
+        lowerQuery.includes('to make')) {
+        return 24 * 60 * 60 * 1000; // 24 hours
+    }
+
+    // Shorter TTL for price/shopping queries (prices change)
+    if (lowerQuery.includes('price') ||
+        lowerQuery.includes('cost') ||
+        lowerQuery.includes('cheap')) {
+        return 2 * 60 * 60 * 1000; // 2 hours
+    }
+
+    return 6 * 60 * 60 * 1000; // 6 hours default
+}
+
+/**
+ * Save Grocery Results to Cache with LLM-based GDPR sanitization
  */
 export const saveGroceryToCache = async (state) => {
     if (!state.result) {
         return {};
     }
-    
+
     const lastUserMessage = state.messages.findLast(m => m.getType() === "human");
     const query = lastUserMessage?.content || "";
-    
-    // Determine cache TTL based on query type
-    let cacheTTL = 6 * 60 * 60 * 1000; // 6 hours default
-    
-    // Longer TTL for recipe/ingredient queries (they don't change often)
-    if (query.toLowerCase().includes('recipe') || 
-        query.toLowerCase().includes('ingredients') || 
-        query.toLowerCase().includes('how to make') ||
-        query.toLowerCase().includes('need for') ||
-        query.toLowerCase().includes('to make')) {
-        cacheTTL = 24 * 60 * 60 * 1000; // 24 hours
-    }
-    
-    // Shorter TTL for price/shopping queries (prices change)
-    if (query.toLowerCase().includes('price') || 
-        query.toLowerCase().includes('cost') || 
-        query.toLowerCase().includes('cheap')) {
-        cacheTTL = 2 * 60 * 60 * 1000; // 2 hours
-    }
-    
-    // Don't cache cart operations (they're user-specific and dynamic)
-    if (query.toLowerCase().includes('cart') || 
-        query.toLowerCase().includes('add to') || 
-        query.toLowerCase().includes('remove')) {
-        console.log("⏭️ Skipping cache for cart operation");
+
+    // Determine TTL using smart logic
+    const cacheTTL = determineCacheTTL(query);
+
+    // Don't cache if TTL is 0 (e.g., cart operations)
+    if (cacheTTL === 0) {
+        console.log("⏭️ Skipping cache for dynamic/personal operation");
         return {};
     }
-    
-    await chatRepository.saveResponseInSemanticCache( 
-        query, 
-        state.result, 
-        cacheTTL,
-        state.sessionId,
-    );
-    
-    console.log(`💾 Saved user query to cache with TTL: ${cacheTTL}ms`);
+
+    try {
+        // Use LLM-based GDPR sanitization
+        const sanitizedQuery = await sanitizeForGDPR(query);
+        const sanitizedResponse = await sanitizeForGDPR(state.result);
+
+        console.log(`💾 Saving sanitized query to cache: "${sanitizedQuery.substring(0, 50)}..."`);
+
+        await saveToSemanticCache(
+            sanitizedQuery,
+            sanitizedResponse,
+            cacheTTL,
+            state.sessionId
+        );
+
+        console.log(`💾 Cached with TTL: ${cacheTTL}ms (${Math.round(cacheTTL / (60 * 60 * 1000))}h) - GDPR compliant`);
+
+    } catch (error) {
+        console.error('Error in GDPR-compliant caching:', error);
+        // Don't fail the whole request if caching fails
+    }
+
     return {};
 };
+

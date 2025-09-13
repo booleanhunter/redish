@@ -2,6 +2,7 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage } from "@langchain/core/messages";
 import CONFIG from '../../../../config.js';
+import { AppError, HttpStatusCode } from '../../../../lib/errors.js';
 
 /**
  * Get ingredients from LLM for a recipe
@@ -48,7 +49,12 @@ Rules:
     try {
         return JSON.parse(response.content);
     } catch (parseError) {
-        throw new Error("Could not parse recipe ingredients. Please try rephrasing your recipe request.");
+        throw new AppError(
+            'LLM_PARSE_ERROR',
+            'Could not parse recipe ingredients from LLM response',
+            HttpStatusCode.BAD_REQUEST,
+            'Could not parse recipe ingredients. Please try rephrasing your recipe request.'
+        );
     }
 }
 

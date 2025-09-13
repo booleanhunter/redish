@@ -6,7 +6,6 @@ import CONFIG from '../../../config.js';
 // Import service functions
 import { getRecipeIngredientsWithProducts, searchProducts } from '../../products/domain/product-service.js';
 import { addItemsToCart, getCart, clearCart } from '../../cart/domain/cart-service.js';
-import { saveToSemanticCache } from '../../chat/domain/chat-service.js';
 
 // Import helper functions
 import { getIngredientsFromLLM, getDirectAnswerFromLLM } from './helpers/llm-helper.js';
@@ -18,7 +17,7 @@ import { getIngredientsFromLLM, getDirectAnswerFromLLM } from './helpers/llm-hel
 export const fastRecipeIngredientsTool = tool(
     async ({ recipe }) => {
         console.log(`🍳 Fast recipe ingredients for: "${recipe}"`);
-        
+
         try {
             const result = await getRecipeIngredientsWithProducts(recipe, getIngredientsFromLLM);
 
@@ -26,13 +25,13 @@ export const fastRecipeIngredientsTool = tool(
             result.ingredientProducts.forEach(item => {
                 console.log(`- ${item.ingredient} (Quantity: ${item.quantity})`);
             });
-            
+
             return JSON.stringify({
                 type: "recipe_ingredients",
                 success: true,
                 ...result
             });
-            
+
         } catch (error) {
             console.error('Error in fast recipe ingredients:', error);
             return JSON.stringify({
@@ -58,17 +57,17 @@ export const fastRecipeIngredientsTool = tool(
 export const directAnswerTool = tool(
     async ({ question }) => {
         console.log(`Direct LLM answer for: "${question}"`);
-        
+
         try {
             const content = await getDirectAnswerFromLLM(question);
-            
+
             return JSON.stringify({
                 type: "direct_answer",
                 success: true,
                 content: content,
                 question: question
             });
-            
+
         } catch (error) {
             console.error('Error in direct answer:', error);
             return JSON.stringify({
@@ -95,17 +94,17 @@ export const directAnswerTool = tool(
 export const searchProductsTool = tool(
     async ({ query, category, maxPrice, minRating, limit = 8, useSemanticSearch = true }) => {
         console.log(`🔍 Searching products: "${query}"`);
-        
+
         try {
-            const result = await searchProducts({ 
-                query, 
-                category, 
-                maxPrice, 
-                minRating, 
+            const result = await searchProducts({
+                query,
+                category,
+                maxPrice,
+                minRating,
                 limit,
                 useSemanticSearch
             });
-            
+
             if (result.products.length === 0) {
                 return JSON.stringify({
                     type: "product_search",
@@ -115,14 +114,14 @@ export const searchProductsTool = tool(
                     products: []
                 });
             }
-            
+
             return JSON.stringify({
                 type: "product_search",
                 success: true,
                 query: query,
                 ...result
             });
-            
+
         } catch (error) {
             console.error('Error searching products:', error);
             return JSON.stringify({
@@ -155,16 +154,16 @@ export const searchProductsTool = tool(
 export const addToCartTool = tool(
     async ({ sessionId, productIds, quantities }) => {
         console.log(`🛒 Adding to cart: ${productIds.join(", ")}`);
-        
+
         try {
             const result = await addItemsToCart(sessionId, productIds, quantities);
-            
+
             return JSON.stringify({
                 type: "cart_operation",
                 operation: "add",
                 ...result
             });
-            
+
         } catch (error) {
             console.error('Error adding to cart:', error);
             return JSON.stringify({
@@ -193,21 +192,21 @@ export const addToCartTool = tool(
 export const viewCartTool = tool(
     async ({ sessionId }) => {
         console.log(`Viewing cart for session: ${sessionId}`);
-        
+
         try {
             const cart = await getCart(sessionId);
-            
+
             return JSON.stringify({
                 type: "cart_operation",
                 operation: "view",
                 success: cart.success,
                 items: cart.items || [],
                 summary: cart.summary || { totalItems: 0, totalPrice: 0 },
-                message: cart.items && cart.items.length > 0 
+                message: cart.items && cart.items.length > 0
                     ? `You have ${cart.summary.totalItems} item(s) in your cart`
                     : "Your cart is empty"
             });
-            
+
         } catch (error) {
             console.error('Error viewing cart:', error);
             return JSON.stringify({
@@ -234,10 +233,10 @@ export const viewCartTool = tool(
 export const clearCartTool = tool(
     async ({ sessionId }) => {
         console.log(`🗑️ Clearing cart for session: ${sessionId}`);
-        
+
         try {
             const result = await clearCart(sessionId);
-            
+
             return JSON.stringify({
                 type: "cart_operation",
                 operation: "clear",
@@ -245,7 +244,7 @@ export const clearCartTool = tool(
                 itemsCleared: result.itemsCleared || 0,
                 message: result.message || "Cart cleared successfully"
             });
-            
+
         } catch (error) {
             console.error('Error clearing cart:', error);
             return JSON.stringify({
@@ -265,53 +264,11 @@ export const clearCartTool = tool(
     }
 );
 
-/**
- * Tool: Save to Semantic Cache
- * Returns structured cache save result
- */
-export const saveToSemanticCacheTool = tool(
-    async ({ query, response, sessionId, ttlDays = 7 }) => {
-        console.log(`💾 Saving to semantic cache: "${query.substring(0, 50)}..."`);
-        
-        try {
-
-            const ttlMillis = ttlDays * 24 * 60 * 60 * 1000;
-            const result = await saveToSemanticCache(sessionId, query, response, ttlMillis);
-            
-            return JSON.stringify({
-                type: "cache_operation",
-                operation: "save",
-                ...result
-            });
-            
-        } catch (error) {
-            console.error('Error saving to semantic cache:', error);
-            return JSON.stringify({
-                type: "cache_operation",
-                operation: "save",
-                success: false,
-                error: "Had trouble saving to cache, but your response is still valid."
-            });
-        }
-    },
-    {
-        name: "save_to_semantic_cache",
-        description: "Save responses to semantic cache for future use.",
-        schema: z.object({
-            query: z.string().describe("The original user query"),
-            response: z.string().describe("The complete response to cache"),
-            sessionId: z.string().describe("User session ID"),
-            ttlDays: z.number().optional().describe("Cache duration in days (default: 7)")
-        })
-    }
-);
-
 export const groceryTools = [
     fastRecipeIngredientsTool,
     searchProductsTool,
     addToCartTool,
     viewCartTool,
     clearCartTool,
-    directAnswerTool,
-    saveToSemanticCacheTool
+    directAnswerTool
 ];

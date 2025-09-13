@@ -77,18 +77,24 @@ export default class ChatRepository {
 
     /**
      * Search user query in langcache
-     * @param {string} sessionId
      * @param {string} query
+     * @param {string} [sessionId] - Optional session identifier to scope the search
      * @returns {Promise<string|null>}
      */
-    async findFromSemanticCache(sessionId, query) {
-        const result = await langCache.search({
+    async findFromSemanticCache(query, sessionId) {
+        const searchParams = {
             prompt: query,
             similarityThreshold: 0.9,
-            attributes: {
+        };
+
+        // Only add sessionId to attributes if it's provided
+        if (sessionId) {
+            searchParams.attributes = {
                 "sessionId": sessionId,
-            }
-        });
+            };
+        }
+
+        const result = await langCache.search(searchParams);
 
         return result.data?.[0]?.response || null;
     }
@@ -96,21 +102,27 @@ export default class ChatRepository {
     /**
      * Save results in Redis Langcache.
      * @async
-     * @param {string} sessionId - Unique identifier for the user session.
      * @param {string} query - The original user query to store as the semantic prompt.
      * @param {string} aiReplyMessage - The AI-generated response to be cached.
      * @param {number} ttlMillis - Time-to-live in milliseconds for the cached entry.
+     * @param {string} [sessionId] - Optional unique identifier for the user session.
      */
     async saveResponseInSemanticCache(query, aiReplyMessage, ttlMillis, sessionId) {
-        const result = await langCache.set({
+        const cacheParams = {
             prompt: query,
             response: aiReplyMessage,
-            attributes: {
-                "sessionId": sessionId
-            },
             ttlMillis,
-        });
-    
+        };
+
+        // Only add sessionId to attributes if it's provided
+        if (sessionId) {
+            cacheParams.attributes = {
+                "sessionId": sessionId
+            };
+        }
+
+        const result = await langCache.set(cacheParams);
+
         return result;
     }
 

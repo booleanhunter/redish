@@ -19,8 +19,7 @@ router.post('/', async function(req, res, next) {
             isCachedResponse: reply.isCachedResponse
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'Something went wrong.' });
+        next(error);
     }
 });
 
@@ -35,8 +34,7 @@ router.post('/end-session', async function(req, res, next) {
         const result = await endUserSession(sessionId);
         res.json(result);
     } catch (error) {
-        console.log(error.stack);
-        res.status(500).json({ error: 'Something went wrong.' });
+        next(error);
     }
 });
 

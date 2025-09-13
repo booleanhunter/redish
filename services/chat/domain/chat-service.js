@@ -6,47 +6,37 @@ const chatRepository = new ChatRepository();
 
 /**
  * Save response to semantic cache
- * @param {string} sessionId - User session ID
  * @param {string} query - Original user query
  * @param {string} response - Response to cache
  * @param {number} ttlMillis - Time to live in milliseconds
+ * @param {string} [sessionId] - Optional user session ID
  * @returns {Promise<Object>} Cache save result
  */
-export async function saveToSemanticCache(sessionId, query, response, ttlMillis) {
-    try {
-        await chatRepository.saveResponseInSemanticCache(
-            query,
-            response,
-            ttlMillis,
-            sessionId
-        );
-        
-        const ttlDays = Math.round(ttlMillis / (24 * 60 * 60 * 1000));
-        
-        return {
-            success: true,
-            ttlDays: ttlDays,
-            message: "Response cached successfully for future queries."
-        };
-    } catch (error) {
-        console.error('Error saving to semantic cache:', error);
-        throw error;
-    }
+export async function saveToSemanticCache(query, response, ttlMillis, sessionId) {
+    await chatRepository.saveResponseInSemanticCache(
+        query,
+        response,
+        ttlMillis,
+        sessionId
+    );
+    
+    const ttlDays = Math.round(ttlMillis / (24 * 60 * 60 * 1000));
+    
+    return {
+        success: true,
+        ttlDays: ttlDays,
+        message: "Response cached successfully for future queries."
+    };
 }
 
 /**
  * Check semantic cache for similar queries
- * @param {string} sessionId - User session ID
  * @param {string} query - User query to check
+ * @param {string} [sessionId] - Optional user session ID for scoped search
  * @returns {Promise<Object|null>} Cached response or null
  */
-export async function checkSemanticCache(sessionId, query) {
-    try {
-        return await chatRepository.findFromSemanticCache(sessionId, query);
-    } catch (error) {
-        console.error('Error checking semantic cache:', error);
-        throw error;
-    }
+export async function checkSemanticCache(query, sessionId) {
+    return await chatRepository.findFromSemanticCache(query, sessionId);
 }
 
 /**
@@ -55,12 +45,7 @@ export async function checkSemanticCache(sessionId, query) {
  * @returns {Promise<Object>} Session end result
  */
 export async function endUserSession(sessionId) {
-    try {
-        return await chatRepository.deleteChats(sessionId);
-    } catch (error) {
-        console.error('Error ending user session:', error);
-        throw error;
-    }
+    return await chatRepository.deleteChats(sessionId);
 }
 
 /**
@@ -72,10 +57,5 @@ export async function endUserSession(sessionId) {
  * @returns {Promise<Object>} AI agent reply
  */
 export async function getReplyFromGroceryAgent(sessionId, chatId, message, useSmartRecall) {
-    try {
-        return await getGroceryShoppingReply(sessionId, chatId, message, useSmartRecall);
-    } catch (error) {
-        console.error('Error getting reply from grocery agent:', error);
-        throw error;
-    }
+    return await getGroceryShoppingReply(sessionId, chatId, message, useSmartRecall);
 }

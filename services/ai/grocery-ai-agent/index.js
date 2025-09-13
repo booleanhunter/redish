@@ -22,14 +22,14 @@ export const createGroceryShoppingAgent = () => {
         .addNode("grocery_cache_check", groceryCacheCheck)
         .addNode("grocery_shopping_agent", groceryShoppingAgent)
         .addNode("save_grocery_cache", saveGroceryToCache)
-        
+
         .addEdge(START, "grocery_cache_check")
         .addConditionalEdges("grocery_cache_check", (state) => {
             return state.cacheStatus === "hit" ? END : "grocery_shopping_agent";
         })
         .addEdge("grocery_shopping_agent", "save_grocery_cache")
         .addEdge("save_grocery_cache", END)
-        
+
         .compile();
     
     return graph;
