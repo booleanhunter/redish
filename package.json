@@ -11,7 +11,7 @@
     "@langchain/core": "^0.3.72",
     "@langchain/langgraph": "^0.4.6",
     "@langchain/openai": "^0.6.9",
-    "@redis-ai/langcache": "^0.9.8",
+    "@redis-ai/langcache": "^0.10.1",
     "cookie-parser": "~1.4.7",
     "csv-parse": "^6.1.0",
     "dotenv": "16.4.5",

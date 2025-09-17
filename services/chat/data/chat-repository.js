@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import { LangCache } from "@redis-ai/langcache";
+import { SearchStrategy } from '@redis-ai/langcache/models/searchstrategy.js';
 
 import CONFIG from '../../../config.js';
 
@@ -84,7 +85,7 @@ export default class ChatRepository {
     async findFromSemanticCache(query, sessionId) {
         const searchParams = {
             prompt: query,
-            similarityThreshold: 0.9,
+            searchStrategies: [SearchStrategy.Exact, SearchStrategy.Semantic]
         };
 
         // Only add sessionId to attributes if it's provided
