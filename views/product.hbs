@@ -40,9 +40,9 @@
     </header>
 
     <!-- Product Details -->
-    <div class="brutal-product-container">
-        <div class="brutal-product-detail">
-            <div class="brutal-product-image-section">
+    <main class="brutal-product-container">
+        <article class="brutal-product-detail">
+            <figure class="brutal-product-image-section">
                 <div class="brutal-product-main-image">
                     <!-- Fallback emoji based on category -->
                     <span class="brutal-product-emoji">
@@ -54,11 +54,11 @@
                         {{#unless product.category}}🛒{{/unless}}
                     </span>
                 </div>
-            </div>
+            </figure>
 
-            <div class="brutal-product-info-section">
-                <div class="brutal-product-header">
-                    <h1 class="brutal-product-title">{{product.name}}</h1>
+            <div class="brutal-product-info-section" data-product-id="{{product.id}}" data-product-category="{{product.category}}">
+                <header class="brutal-product-header">
+                    <h2 class="brutal-product-title">{{product.name}}</h2>
                     {{#if product.brand}}
                         <p class="brutal-product-brand">BY {{product.brand}}</p>
                     {{/if}}
@@ -72,210 +72,64 @@
                             <span class="brutal-type-badge">{{product.type}}</span>
                         {{/if}}
                     </div>
-                </div>
+                </header>
 
-                <div class="brutal-product-rating">
+            <section class="brutal-product-rating" aria-label="Product Rating">
                     {{#if product.rating}}
                         <div class="brutal-rating-stars">
                             {{#repeat product.rating}}⭐{{/repeat}}
                             <span class="brutal-rating-text">{{product.rating}}/5</span>
                         </div>
                     {{/if}}
-                </div>
+            </section>
 
-                <div class="brutal-product-pricing">
+            <section class="brutal-product-pricing" aria-label="Pricing Information">
                     <div class="brutal-price-section">
-                        <span class="brutal-current-price">₹{{product.salePrice}}</span>
+                        <data class="brutal-current-price" value="{{product.salePrice}}">₹{{product.salePrice}}</data>
                         
                     </div>
                     {{#if product.isOnSale}}
                         <div class="brutal-sale-banner">🔥 ON SALE!</div>
                     {{/if}}
-                </div>
+            </section>
 
                 {{#if product.description}}
-                    <div class="brutal-product-description">
-                        <h3>DESCRIPTION</h3>
+                    <section class="brutal-product-description" aria-labelledby="description-heading">
+                        <h3 id="description-heading">DESCRIPTION</h3>
                         <p>{{product.description}}</p>
-                    </div>
+                    </section>
                 {{/if}}
 
-                <div class="brutal-product-actions">
-                    <div class="brutal-quantity-section">
-                        <label for="quantity">QUANTITY:</label>
+                <form class="brutal-product-actions" aria-label="Add to Cart">
+                    <fieldset class="brutal-quantity-section">
+                        <legend>QUANTITY:</legend>
                         <div class="brutal-quantity-controls">
-                            <button class="brutal-quantity-btn" onclick="changeQuantity(-1)">-</button>
-                            <input type="number" id="quantity" value="1" min="1" max="10">
-                            <button class="brutal-quantity-btn" onclick="changeQuantity(1)">+</button>
+                            <button type="button" class="brutal-quantity-btn" data-quantity-change="-1">-</button>
+                            <input type="number" id="quantity" value="1" min="1" max="10" aria-label="Quantity">
+                            <button type="button" class="brutal-quantity-btn" data-quantity-change="1">+</button>
                         </div>
-                    </div>
+                    </fieldset>
                     
-                    <button class="brutal-add-to-cart-btn" onclick="addToCart('{{product.id}}')">
+                    <button type="submit" class="brutal-add-to-cart-btn">
                         <i class="fas fa-shopping-cart"></i>
                         ADD TO CART
                     </button>
-                </div>
-
-                <div class="brutal-product-meta">
-                    <div class="brutal-meta-item">
-                        <strong>PRODUCT ID:</strong> {{product.id}}
-                    </div>
-                    <div class="brutal-meta-item">
-                        <strong>CATEGORY:</strong> {{product.category}}
-                    </div>
-                    {{#if product.brand}}
-                        <div class="brutal-meta-item">
-                            <strong>BRAND:</strong> {{product.brand}}
-                        </div>
-                    {{/if}}
-                </div>
+                </form>
             </div>
-        </div>
+        </article>
 
         <!-- Related Products Section -->
-        <div class="brutal-related-products">
-            <h3>YOU MIGHT ALSO LIKE</h3>
-            <div id="related-products-grid" class="brutal-products-grid">
+        <aside class="brutal-related-products" aria-labelledby="related-heading">
+            <h3 id="related-heading">YOU MIGHT ALSO LIKE</h3>
+            <div id="related-products-grid" class="brutal-products-grid" role="list">
                 <!-- Related products will be loaded here -->
             </div>
-        </div>
-    </div>
+        </aside>
+    </main>
 
     <!-- Success/Error Messages -->
     <div id="notification-container"></div>
 
-    <script>
-        // Get session ID from URL or generate one
-        const urlParams = new URLSearchParams(window.location.search);
-        const userName = urlParams.get('name') || 'User';
-        const sessionId = `${userName.toLowerCase()}_${Date.now()}`;
-
-        function changeQuantity(delta) {
-            const quantityInput = document.getElementById('quantity');
-            const currentValue = parseInt(quantityInput.value) || 1;
-            const newValue = Math.max(1, Math.min(10, currentValue + delta));
-            quantityInput.value = newValue;
-        }
-
-        async function addToCart(productId) {
-            const quantity = parseInt(document.getElementById('quantity').value) || 1;
-            const addBtn = document.querySelector('.brutal-add-to-cart-btn');
-            
-            // Disable button during request
-            addBtn.disabled = true;
-            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ADDING...';
-
-            try {
-                const response = await fetch('/api/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sessionId: sessionId,
-                        productId: productId,
-                        quantity: quantity
-                    }),
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    showNotification(`✅ ${result.message}`, 'success');
-                    updateCartCount();
-                } else {
-                    showNotification(`❌ ${result.error}`, 'error');
-                }
-
-            } catch (error) {
-                console.error('Error adding to cart:', error);
-                showNotification('❌ Failed to add to cart. Please try again.', 'error');
-            } finally {
-                // Re-enable button
-                addBtn.disabled = false;
-                addBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> ADD TO CART';
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 10px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-                z-index: 10000;
-                transform: translateX(100%);
-                transition: all 0.3s ease;
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            setTimeout(() => {
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-        async function updateCartCount() {
-            try {
-                const response = await fetch(`/api/cart/${sessionId}`);
-                const cart = await response.json();
-                
-                if (cart.success) {
-                    const cartCount = document.querySelector('.cart-count');
-                    if (cartCount) {
-                        cartCount.textContent = cart.summary.totalItems;
-                    }
-                }
-            } catch (error) {
-                console.error('Error updating cart count:', error);
-            }
-        }
-
-        // Load related products
-        async function loadRelatedProducts() {
-            try {
-                const category = '{{product.category}}';
-                const currentProductId = '{{product.id}}';
-                
-                const response = await fetch('/api/cart/related', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        category: category,
-                        excludeId: currentProductId,
-                        limit: 4
-                    }),
-                });
-
-                // For now, we'll implement this later
-                console.log('Related products feature coming soon');
-                
-            } catch (error) {
-                console.error('Error loading related products:', error);
-            }
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCartCount();
-            loadRelatedProducts();
-        });
-    </script>
+    <script src="/javascripts/index-product.js" type="module"></script>
 </body>
 </html>

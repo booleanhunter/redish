@@ -20,6 +20,26 @@
     --brutal-shadow-active: 2px 2px 0px 0px #163342;
 }
 
+/* Semantic HTML5 Element Resets */
+main, article, section, header, figure, aside, fieldset, legend {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+}
+
+legend {
+    padding: 0;
+    margin: 0;
+    display: block;
+}
+
 /* Font Imports and Base Styles */
 .neo-brutalist-theme {
     font-family: 'Inter', 'Space Grotesk', sans-serif;

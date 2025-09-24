@@ -120,7 +120,7 @@ export async function loadProductsFromCSV(csvFilePath, batchSize = 50, maxProduc
                 marketPrice: parseFloat(record.market_price) || 0,
                 type: record.type?.trim() || '',
                 rating: parseFloat(record.rating) || 0,
-                description: record.description?.trim().substring(0, 200) || '', // Limit description length
+                description: record.description?.trim() || '',
                 discount: record.market_price && record.sale_price ? 
                     Math.round(((parseFloat(record.market_price) - parseFloat(record.sale_price)) / parseFloat(record.market_price)) * 100) : 0,
                 isOnSale: record.market_price && record.sale_price && parseFloat(record.market_price) > parseFloat(record.sale_price)
