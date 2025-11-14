@@ -2,6 +2,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { AIMessage } from "@langchain/core/messages";
 import { groceryTools } from "./tools.js";
 import { checkSemanticCache, saveToSemanticCache } from "../../chat/domain/chat-service.js";
+import { determineToolBasedCacheTTL } from "../helpers/caching.js";
 import CONFIG from "../../../config.js";
 
 /**
@@ -193,12 +194,12 @@ export const processWorkOutputWithCaching = async (state) => {
     const lastUserMessage = state.messages.findLast(m => m.getType() === "human");
     const query = lastUserMessage?.content || "";
 
-    // Determine TTL for cache
-    const cacheTTL = determineCacheTTL(query);
+    // Determine cache TTL based on tools used
+    const cacheTTL = determineToolBasedCacheTTL(state.toolsUsed || []);
 
-    // Don't cache if TTL is 0 (e.g., cart operations)
+    // Don't cache if TTL is 0 (personal/dynamic operations)
     if (cacheTTL === 0) {
-        console.log("⏭️ Skipping cache for dynamic/personal operation");
+        console.log("Skipping cache for personal/dynamic operations");
         return {};
     }
 
@@ -228,42 +229,7 @@ export const processWorkOutputWithCaching = async (state) => {
     return {};
 };
 
-/**
- * Determine cache TTL based on query type
- * TODO: To be replaced by a better caching logic (e.g: semantic routing)
- */
-function determineCacheTTL(query) {
-    if (!query || typeof query !== 'string') {
-        return 6 * 60 * 60 * 1000; // 6 hours default
-    }
 
-    const lowerQuery = query.toLowerCase();
-
-    // Don't cache cart operations (they're user-specific and dynamic)
-    if (lowerQuery.includes('cart') ||
-        lowerQuery.includes('add to') ||
-        lowerQuery.includes('remove')) {
-        return 0; // Don't cache
-    }
-
-    // Longer TTL for recipe/ingredient queries (they don't change often)
-    if (lowerQuery.includes('recipe') ||
-        lowerQuery.includes('ingredients') ||
-        lowerQuery.includes('how to make') ||
-        lowerQuery.includes('need for') ||
-        lowerQuery.includes('to make')) {
-        return 24 * 60 * 60 * 1000; // 24 hours
-    }
-
-    // Shorter TTL for price/shopping queries (prices change)
-    if (lowerQuery.includes('price') ||
-        lowerQuery.includes('cost') ||
-        lowerQuery.includes('cheap')) {
-        return 2 * 60 * 60 * 1000; // 2 hours
-    }
-
-    return 6 * 60 * 60 * 1000; // 6 hours default
-}
 
 /**
  * LLM-based GDPR-compliant data sanitization
