@@ -104,7 +104,6 @@ export const fastRecipeIngredientsTool = tool(
             });
 
             return JSON.stringify({
-                type: "recipe_ingredients",
                 success: true,
                 recipe: ingredientsData.recipe || recipe,
                 totalIngredients: result.totalIngredients,
@@ -115,7 +114,6 @@ export const fastRecipeIngredientsTool = tool(
         } catch (error) {
             console.error('Error in fast recipe ingredients:', error);
             return JSON.stringify({
-                type: "recipe_ingredients",
                 success: false,
                 error: `Sorry, I had trouble getting ingredients for "${recipe}". Please try rephrasing.`
             });
@@ -163,7 +161,6 @@ Do not mention specific product prices or brands - focus on general knowledge an
             ]);
 
             return JSON.stringify({
-                type: "direct_answer",
                 success: true,
                 content: response.content,
                 question: question
@@ -172,7 +169,6 @@ Do not mention specific product prices or brands - focus on general knowledge an
         } catch (error) {
             console.error('Error in direct answer:', error);
             return JSON.stringify({
-                type: "direct_answer",
                 success: false,
                 error: `Sorry, I had trouble answering your question about "${question}". Please try rephrasing.`,
                 question: question
@@ -221,7 +217,6 @@ export const searchProductsTool = tool(
 
             if (result.products.length === 0) {
                 return JSON.stringify({
-                    type: "product_search",
                     success: false,
                     message: `No products found for "${query}". Try different keywords or check the spelling.`,
                     query: query,
@@ -230,7 +225,6 @@ export const searchProductsTool = tool(
             }
 
             const response = {
-                type: "product_search",
                 success: true,
                 query: query,
                 ...result
@@ -241,7 +235,6 @@ export const searchProductsTool = tool(
         } catch (error) {
             console.error('Error searching products:', error);
             return JSON.stringify({
-                type: "product_search",
                 success: false,
                 error: `Sorry, I had trouble searching for "${query}". Please try again.`,
                 query: query,
@@ -275,7 +268,6 @@ export const addToCartTool = tool(
             const result = await addItemsToCart(sessionId, productIds, quantities);
 
             return JSON.stringify({
-                type: "cart_operation",
                 operation: "add",
                 ...result
             });
@@ -283,7 +275,6 @@ export const addToCartTool = tool(
         } catch (error) {
             console.error('Error adding to cart:', error);
             return JSON.stringify({
-                type: "cart_operation",
                 operation: "add",
                 success: false,
                 error: "Failed to add items to cart. Please try again."
@@ -313,7 +304,6 @@ export const viewCartTool = tool(
             const cart = await getCart(sessionId);
 
             return JSON.stringify({
-                type: "cart_operation",
                 operation: "view",
                 success: cart.success,
                 items: cart.items || [],
@@ -326,7 +316,6 @@ export const viewCartTool = tool(
         } catch (error) {
             console.error('Error viewing cart:', error);
             return JSON.stringify({
-                type: "cart_operation",
                 operation: "view",
                 success: false,
                 error: "Failed to get cart contents"
@@ -354,7 +343,6 @@ export const clearCartTool = tool(
             const result = await clearCart(sessionId);
 
             return JSON.stringify({
-                type: "cart_operation",
                 operation: "clear",
                 success: result.success,
                 itemsCleared: result.itemsCleared || 0,
@@ -364,7 +352,6 @@ export const clearCartTool = tool(
         } catch (error) {
             console.error('Error clearing cart:', error);
             return JSON.stringify({
-                type: "cart_operation",
                 operation: "clear",
                 success: false,
                 error: "Failed to clear cart"

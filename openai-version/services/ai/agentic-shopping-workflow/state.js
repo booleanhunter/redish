@@ -11,7 +11,7 @@ import { z } from "zod";
  * @property {string} sessionId - Unique session ID for tracking the user's shopping session
  * @property {string} [result] - Optional result string, typically the agent's final response
  * @property {"hit" | "miss"} [cacheStatus] - Cache indicator showing if a cached result was used
- * @property {Array<string>} [toolsUsed] - Names of the tools invoked by the agent during processing
+ * @property {Array<Object>} [toolResults] - Structured tool execution results with metadata
  * @property {Array<Object>} [foundProducts] - Products found during search operations
  * @property {number} [cartTotal] - Current total value of items in the shopping cart
  * @property {string} [lastSearchQuery] - Last search query performed for context
@@ -21,7 +21,12 @@ export const ShoppingAgentState = MessagesZodState.extend({
     sessionId: z.string(),
     result: z.string().optional(),
     cacheStatus: z.enum(["hit", "miss"]).optional(),
-    toolsUsed: z.array(z.string()).optional(),
+    toolResults: z.array(z.object({
+        toolName: z.string(),
+        success: z.boolean(),
+        error: z.string().optional(),
+        result: z.any().optional()
+    })).optional(),
     foundProducts: z.array(z.object({
         id: z.string(),
         name: z.string(),

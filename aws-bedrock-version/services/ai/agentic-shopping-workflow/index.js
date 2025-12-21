@@ -37,15 +37,17 @@ export const createAgenticAIShoppingWorkflow = () => {
 export const shoppingWorkflowGraph = createAgenticAIShoppingWorkflow();
 
 export function getWorkflowExecutionSummary(graphResult) {
+    const toolNames = (graphResult.toolResults || []).map(tr => tr.toolName);
+
     const summary = {
-        toolsUsed: graphResult.toolsUsed || ["none"],
+        toolsUsed: toolNames.length > 0 ? toolNames : ["none"],
         cacheStatus: graphResult.cacheStatus || "miss",
         guardrailTestResult: graphResult.guardrailTestResult || "not-tested",
         finalResult: graphResult.result,
         sessionId: graphResult.sessionId,
         productsFound: graphResult.foundProducts?.length || 0
     };
-    
+
     console.log("\n🛒 GROCERY SHOPPING EXECUTION SUMMARY:");
     console.log(`Session: ${summary.sessionId}`);
     console.log(`Cache: ${summary.cacheStatus === "hit" ? "🎯 HIT" : "❌ MISS"}`);
@@ -63,6 +65,7 @@ export function getWorkflowExecutionSummary(graphResult) {
                 case "add_to_cart": return "🛒 Add to Cart";
                 case "view_cart": return "👀 View Cart";
                 case "clear_cart": return "🗑️ Clear Cart";
+                case "fast_recipe_ingredients": return "🍳 Recipe Ingredients";
                 case "save_to_semantic_cache": return "💾 Save Cache";
                 case "error": return "❌ Error";
                 default: return `🔧 ${tool}`;
@@ -71,12 +74,12 @@ export function getWorkflowExecutionSummary(graphResult) {
         console.log(`Tools Used: ${toolIcons.join(" → ")}`);
         console.log(`Tool Count: ${summary.toolsUsed.length}`);
     }
-    
+
     if (summary.productsFound > 0) {
         console.log(`Products Found: ${summary.productsFound}`);
     }
     console.log("─".repeat(50));
-    
+
     return summary;
 }
 

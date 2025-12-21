@@ -2,6 +2,7 @@ import { ChatBedrockConverse } from "@langchain/aws";
 import { AIMessage } from "@langchain/core/messages";
 import { groceryTools } from "./tools.js";
 import { checkSemanticCache, saveToSemanticCache } from "../../chat/domain/chat-service.js";
+import { determineToolBasedCacheTTL } from "../helpers/caching.js";
 import CONFIG from "../../../config.js";
 
 /**
@@ -171,33 +172,35 @@ Make responses helpful, fast, and easy to interact with!`;
             { role: "system", content: systemPrompt },
             ...state.messages
         ];
-        let toolsUsed = [];
+        let toolResults = [];
         let foundProducts = [];
-        
+
         while (true) {
             const response = await modelWithTools.invoke(currentMessages);
             currentMessages.push(response);
 
             if (!response.tool_calls || response.tool_calls.length === 0) {
                 console.log("🛒 Shopping agent finished with response");
-                
+
                 return {
                     result: response.content,
                     messages: [...state.messages, new AIMessage(response.content)],
-                    toolsUsed: toolsUsed.length > 0 ? toolsUsed : ["none"],
+                    toolResults,
                     foundProducts,
                     sessionId: state.sessionId
                 };
             }
 
             for (const toolCall of response.tool_calls) {
-                let toolResult;
-                
                 console.log(`🔧 Shopping agent using tool: ${toolCall.name}`);
-                toolsUsed.push(toolCall.name);
 
                 // Find and invoke the appropriate tool
                 const tool = groceryTools.find(t => t.name === toolCall.name);
+
+                let toolResultString;
+                let parsedResult;
+                let success = false;
+                let error;
 
                 if (tool) {
                     // Add sessionId to tool arguments if needed
@@ -205,33 +208,48 @@ Make responses helpful, fast, and easy to interact with!`;
                     if (['add_to_cart', 'view_cart', 'clear_cart', 'save_to_semantic_cache'].includes(toolCall.name)) {
                         toolArgs.sessionId = state.sessionId;
                     }
-                    
-                    toolResult = await tool.invoke(toolArgs);
-                    
-                    // Parse JSON response to extract products for summary
+
+                    toolResultString = await tool.invoke(toolArgs);
+
+                    // Parse JSON response
                     try {
-                        const parsedResult = JSON.parse(toolResult);
-                        if (parsedResult.type === "product_search" && parsedResult.products) {
+                        parsedResult = JSON.parse(toolResultString);
+                        success = parsedResult.success !== false;
+                        error = parsedResult.error;
+
+                        // Extract products for summary based on tool name
+                        if (toolCall.name === "search_products" && parsedResult.products) {
                             foundProducts = parsedResult.products;
-                        } else if (parsedResult.type === "recipe_ingredients" && parsedResult.ingredientProducts) {
+                        } else if (toolCall.name === "fast_recipe_ingredients" && parsedResult.ingredientProducts) {
                             foundProducts = parsedResult.ingredientProducts
                                 .filter(item => item.suggestedProduct)
                                 .map(item => item.suggestedProduct);
                         }
                     } catch (parseError) {
                         console.warn("Could not parse tool result as JSON:", parseError);
+                        success = false;
+                        error = "Failed to parse tool result";
                     }
                 } else {
-                    toolResult = JSON.stringify({
-                        type: "error",
+                    success = false;
+                    error = "Unknown tool requested";
+                    toolResultString = JSON.stringify({
                         success: false,
-                        error: "Unknown tool requested"
+                        error
                     });
                 }
 
+                // Store structured tool result
+                toolResults.push({
+                    toolName: toolCall.name,
+                    success,
+                    error,
+                    result: parsedResult
+                });
+
                 currentMessages.push({
                     role: "tool",
-                    content: toolResult,
+                    content: toolResultString,
                     tool_call_id: toolCall.id,
                 });
             }
@@ -239,11 +257,15 @@ Make responses helpful, fast, and easy to interact with!`;
     } catch (error) {
         console.error("❌ Personal shopper agent error:", error);
         const fallbackMessage = "I apologize, but I'm having trouble with your grocery request right now. Please try asking about recipe ingredients, searching for products, or managing your cart!";
-        
+
         return {
             result: fallbackMessage,
             messages: [...state.messages, new AIMessage(fallbackMessage)],
-            toolsUsed: ["error"],
+            toolResults: [{
+                toolName: "error",
+                success: false,
+                error: error.message
+            }],
             sessionId: state.sessionId
         };
     }
@@ -260,12 +282,12 @@ export const processWorkOutputWithCaching = async (state) => {
     const lastUserMessage = state.messages.findLast(m => m.getType() === "human");
     const query = lastUserMessage?.content || "";
 
-    // Determine TTL for cache
-    const cacheTTL = determineCacheTTL(query);
+    // Determine cache TTL based on tool execution results
+    const cacheTTL = determineToolBasedCacheTTL(state.toolResults || []);
 
-    // Don't cache if TTL is 0 (e.g., cart operations)
+    // Don't cache if TTL is 0 (personal/dynamic operations or failures)
     if (cacheTTL === 0) {
-        console.log("⏭️ Skipping cache for dynamic/personal operation");
+        console.log("Skipping cache for personal/dynamic operations or tool failures");
         return {};
     }
 
@@ -295,42 +317,6 @@ export const processWorkOutputWithCaching = async (state) => {
     return {};
 };
 
-/**
- * Determine cache TTL based on query type
- * TODO: To be replaced by a better caching logic (e.g: semantic routing)
- */
-function determineCacheTTL(query) {
-    if (!query || typeof query !== 'string') {
-        return 6 * 60 * 60 * 1000; // 6 hours default
-    }
-
-    const lowerQuery = query.toLowerCase();
-
-    // Don't cache cart operations (they're user-specific and dynamic)
-    if (lowerQuery.includes('cart') ||
-        lowerQuery.includes('add to') ||
-        lowerQuery.includes('remove')) {
-        return 0; // Don't cache
-    }
-
-    // Longer TTL for recipe/ingredient queries (they don't change often)
-    if (lowerQuery.includes('recipe') ||
-        lowerQuery.includes('ingredients') ||
-        lowerQuery.includes('how to make') ||
-        lowerQuery.includes('need for') ||
-        lowerQuery.includes('to make')) {
-        return 24 * 60 * 60 * 1000; // 24 hours
-    }
-
-    // Shorter TTL for price/shopping queries (prices change)
-    if (lowerQuery.includes('price') ||
-        lowerQuery.includes('cost') ||
-        lowerQuery.includes('cheap')) {
-        return 2 * 60 * 60 * 1000; // 2 hours
-    }
-
-    return 6 * 60 * 60 * 1000; // 6 hours default
-}
 
 /**
  * Data compliance agent for regulatory requirements (GDPR, privacy, security)
