@@ -51,14 +51,14 @@ This repository contains two versions of the demo:
 ├── openai-version/       # OpenAI-powered version
 │   ├── package.json
 │   ├── index.js
-│   ├── services/
+│   ├── modules/
 │   └── ...
 │   └── README.md         # Setup instructions
 │
 ├── aws-bedrock-version/  # AWS Bedrock version
 │   ├── package.json
 │   ├── index.js
-│   ├── services/
+│   ├── modules/
 │   └── ...
 │   └── README.md         # Setup instructions
 └── README.md             # This file
@@ -113,13 +113,13 @@ The grocery agent uses a LangGraph-powered AI agent that routes requests through
 1. **Cache Check**: First checks Redis semantic cache for similar queries
 2. **AI Agent**: Routes to appropriate tools based on request type
 3. **Specialized Tools**: Recipe ingredients, product search, cart operations, direct answers
-4. **Services Layer**: Product, cart, and chat services
+4. **Modules Layer**: Product, cart, and chat modules
 5. **Redis Storage**: Vector embeddings, semantic cache, and session data
 
 ### Project architecture
 
 ```
-services/
+modules/
   ├── products/                # Product Business Component
   │   ├── api/                    # REST API endpoints
   │   ├── domain/                 # Business logic

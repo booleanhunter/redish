@@ -8,11 +8,12 @@ import { create } from 'express-handlebars';
 import CONFIG from './config.js';
 import { handleError } from './lib/errors.js';
 
-import indexRouter from './services/routes/index.js';
-// New service-based routes
-import cartRouter from './services/cart/api/cart-routes.js';
-import chatRouter from './services/chat/api/chat-routes.js';
-import productRouter from './services/products/api/product-routes.js';
+import indexRouter from './modules/index-routes.js';
+// Module-based routes
+import cartRouter from './modules/cart/api/cart-routes.js';
+import chatRouter from './modules/chat/api/chat-routes.js';
+import productApiRouter from './modules/products/api/product-routes.js';
+import productPagesRouter from './modules/products/api/product-pages.js';
 
 import { fileURLToPath } from 'url';
 
@@ -52,9 +53,10 @@ app.use(express.static(path.join(__dirname, 'client')));
 
 // initialize routes
 app.use('/', indexRouter);
-app.use('/ai/chat', chatRouter); // Chat/AI routes
+app.use('/api/ai/chat', chatRouter); // Chat/AI routes
 app.use('/api/cart', cartRouter); // Cart API routes
-app.use('/api/products', productRouter); // Product API routes
+app.use('/api/products', productApiRouter); // Product API routes (JSON)
+app.use('/products', productPagesRouter); // Product pages (HTML)
 
 const server = http.createServer(app);
 

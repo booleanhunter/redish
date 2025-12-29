@@ -17,7 +17,7 @@ export class MessageFormatter {
                         <button class="cart-icon-btn" data-product-id="${productId}" title="Add to Cart">
                             🛒
                         </button>
-                        <a href="/product/${productId}" class="product-link" title="View Details" target="_blank">
+                        <a href="/products/${productId}" class="product-link" title="View Details" target="_blank">
                             👁️
                         </a>
                     </span>

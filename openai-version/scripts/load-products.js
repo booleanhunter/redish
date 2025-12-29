@@ -1,4 +1,4 @@
-import { loadProductsFromCSV, checkRedisMemory } from '../services/products/data/product-loader.js';
+import { loadProductsFromCSV, checkRedisMemory } from '../modules/products/data/product-loader.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -13,7 +13,7 @@ async function main() {
         await checkRedisMemory();
         
         // Get command line arguments
-        const csvFilePath = process.argv[2] || join(__dirname, '../services/products/data/bigbasket-products.csv');
+        const csvFilePath = process.argv[2] || join(__dirname, '../modules/products/data/bigbasket-products.csv');
         const batchSize = parseInt(process.argv[3]) || 100; // Increased since we're filtering out categories
         const maxProducts = parseInt(process.argv[4]) || 2000; // Increased limit since we have fewer products
         

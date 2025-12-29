@@ -1,20 +1,11 @@
 import { Router } from 'express';
-import CONFIG from '../../config.js';
-import { getProductById } from '../products/domain/product-service.js';
+import { getProductById } from '../domain/product-service.js';
+import CONFIG from '../../../config.js';
 
 const router = Router();
 
-/* GET home page - directly serve the chat interface */
-router.get('/', function(req, res, next) {
-	res.render('chat', { app_name: CONFIG.appName || 'Redish' });
-});
-
-router.get('/app', function(req, res, next) {
-	res.render('chat', { app_name: CONFIG.appName || 'Redish' });
-});
-
-/* GET product details page */
-router.get('/product/:productId', async function(req, res, next) {
+/* GET product details page (HTML view) */
+router.get('/:productId', async function(req, res, next) {
 	const { productId } = req.params;
 	
 	try {
@@ -41,3 +32,4 @@ router.get('/product/:productId', async function(req, res, next) {
 });
 
 export default router;
+

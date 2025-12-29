@@ -50,7 +50,7 @@ export class RelatedProducts {
                 <div class="brutal-product-info">
                     <h4>${product.name}</h4>
                     <p class="brutal-product-price">₹${product.salePrice}</p>
-                    <a href="/product/${product.id}" class="brutal-view-btn">VIEW PRODUCT</a>
+                    <a href="/products/${product.id}" class="brutal-view-btn">VIEW PRODUCT</a>
                 </div>
             </div>
         `).join('');

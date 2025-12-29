@@ -1,4 +1,4 @@
-import { loadProductsFromCSV, checkRedisMemory } from '../services/products/data/product-loader.js';
+import { loadProductsFromCSV, checkRedisMemory } from '../modules/products/data/product-loader.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -19,7 +19,7 @@ async function main() {
         // Filter out flags to get positional arguments
         const positionalArgs = args.filter(arg => !arg.startsWith('--'));
 
-        const csvFilePath = positionalArgs[0] || join(__dirname, '../services/products/data/bigbasket-products.csv');
+        const csvFilePath = positionalArgs[0] || join(__dirname, '../modules/products/data/bigbasket-products.csv');
         const batchSize = parseInt(positionalArgs[1]) || 100; // Increased since we're filtering out categories
         const maxProducts = parseInt(positionalArgs[2]) || 2000; // Increased limit since we have fewer products
 

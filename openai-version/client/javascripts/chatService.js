@@ -63,7 +63,7 @@ export async function sendChatMessage(sessionId, chatId, message, options = {}) 
     try {
         onLoad?.();
         const startTime = performance.now();
-        const res = await fetch('/ai/chat', {
+        const res = await fetch('/api/ai/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -116,7 +116,7 @@ export async function endSession(sessionId, options = {}) {
     try {
         onLoad?.();
 
-        const res = await fetch('/ai/chat/end-session', {
+        const res = await fetch('/api/ai/chat/end-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sessionId }),

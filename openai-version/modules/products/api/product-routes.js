@@ -9,7 +9,7 @@ router.get('/:productId', async function(req, res, next) {
 
     try {
         const product = await getProductById(productId);
-        
+
         if (!product) {
             return res.status(404).json({
                 success: false,
