@@ -1,7 +1,7 @@
 import { loadCartCount } from '../../services/cartService.js';
 
 export class CartCount {
-    constructor(selector = '.brutal-cart-count') {
+    constructor(selector = '.cart-count') {
         this.element = document.querySelector(selector);
     }
 

@@ -47,9 +47,9 @@ export class ChatWindow {
     showWelcomeMessage() {
         if (this.messagesContainer) {
             this.messagesContainer.innerHTML = `
-                <div class="brutal-welcome-message">
-                    <div class="brutal-assistant-avatar">🤖</div>
-                    <div class="brutal-message-content">
+                <div class="welcome-message">
+                    <div class="assistant-avatar">🤖</div>
+                    <div class="message-content">
                         <p>Session ended! 👋 Starting fresh...</p>
                         <p>What would you like to cook today?</p>
                     </div>
@@ -61,9 +61,9 @@ export class ChatWindow {
     showNewChatMessage() {
         if (this.messagesContainer) {
             this.messagesContainer.innerHTML = `
-                <div class="brutal-welcome-message">
-                    <div class="brutal-assistant-avatar">🤖</div>
-                    <div class="brutal-message-content">
+                <div class="welcome-message">
+                    <div class="assistant-avatar">🤖</div>
+                    <div class="message-content">
                         <p>New chat started! 🎉</p>
                         <p>I can help you with:</p>
                         <ul>

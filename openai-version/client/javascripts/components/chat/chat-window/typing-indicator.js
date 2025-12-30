@@ -9,8 +9,8 @@ export class TypingIndicator {
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message typing-indicator';
         typingDiv.innerHTML = `
-            <div class="brutal-assistant-avatar">🤖</div>
-            <div class="brutal-message-content typing-content">
+            <div class="assistant-avatar">🤖</div>
+            <div class="message-content typing-content">
                 <div class="typing-dots">
                     <span></span><span></span><span></span>
                 </div>

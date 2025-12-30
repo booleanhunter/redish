@@ -23,7 +23,7 @@ export class ProductApp {
         this.sessionId = session.sessionId;
 
         // Initialize components
-        this.cartCount = new CartCount('.brutal-cart-count');
+        this.cartCount = new CartCount('.cart-count');
         this.cartButton = new CartButton(
             (result) => this.handleCartSuccess(result),
             (error) => this.handleCartError(error)
@@ -41,7 +41,7 @@ export class ProductApp {
 
     setupEventHandlers() {
         // Quantity controls
-        const quantityBtns = document.querySelectorAll('.brutal-quantity-btn[data-quantity-change]');
+        const quantityBtns = document.querySelectorAll('.quantity-btn[data-quantity-change]');
 
         quantityBtns.forEach(btn => {
             const delta = parseInt(btn.dataset.quantityChange);
@@ -49,13 +49,13 @@ export class ProductApp {
         });
 
         // Add to cart form
-        const addToCartForm = document.querySelector('.brutal-product-actions');
+        const addToCartForm = document.querySelector('.product-actions');
         if (addToCartForm) {
             addToCartForm.addEventListener('submit', (e) => this.handleAddToCart(e));
         }
 
         // Also handle the direct button click (fallback)
-        const addToCartBtn = document.querySelector('.brutal-add-to-cart-btn');
+        const addToCartBtn = document.querySelector('.add-to-cart-btn');
         if (addToCartBtn) {
             addToCartBtn.removeAttribute('onclick');
             addToCartBtn.addEventListener('click', (e) => {
@@ -79,7 +79,7 @@ export class ProductApp {
     async handleAddToCart(e) {
         e.preventDefault();
 
-        const addBtn = document.querySelector('.brutal-add-to-cart-btn');
+        const addBtn = document.querySelector('.add-to-cart-btn');
         const originalContent = addBtn.innerHTML;
         const quantity = this.productQuantity.getQuantity();
 

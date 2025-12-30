@@ -10,7 +10,7 @@ export class ChatToggle {
         if (this.chatToggle && this.chatWindow) {
             this.chatToggle.addEventListener('click', () => {
                 this.chatWindow.classList.toggle('active');
-                const chatBubble = this.chatToggle.querySelector('.brutal-chat-bubble');
+                const chatBubble = this.chatToggle.querySelector('.chat-bubble');
                 if (chatBubble && this.chatWindow.classList.contains('active')) {
                     chatBubble.style.display = 'none';
                 }
@@ -20,7 +20,7 @@ export class ChatToggle {
         if (this.minimizeChat && this.chatWindow) {
             this.minimizeChat.addEventListener('click', () => {
                 this.chatWindow.classList.remove('active');
-                const chatBubble = this.chatToggle.querySelector('.brutal-chat-bubble');
+                const chatBubble = this.chatToggle.querySelector('.chat-bubble');
                 if (chatBubble) {
                     chatBubble.style.display = 'block';
                 }

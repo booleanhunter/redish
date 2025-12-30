@@ -18,34 +18,34 @@
 </head>
 <body class="neo-brutalist-theme">
     <!-- Header -->
-    <header class="brutal-header">
-        <div class="brutal-header-container">
-            <div class="brutal-logo-section">
-                <h1 class="brutal-site-logo">
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <h1 class="site-logo">
                     <i class="fas fa-shopping-basket"></i>
                     <a href="/app">{{app_name}}</a>
                 </h1>
             </div>
             
-            <div class="brutal-header-actions">
-                <button onclick="history.back()" class="brutal-back-btn">
+            <div class="header-actions">
+                <button onclick="history.back()" class="back-btn">
                     <i class="fas fa-arrow-left"></i> BACK
                 </button>
-                <div class="brutal-cart-info">
+                <div class="cart-info">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="brutal-cart-count">0</span>
+                    <span class="cart-count">0</span>
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Product Details -->
-    <main class="brutal-product-container">
-        <article class="brutal-product-detail">
-            <figure class="brutal-product-image-section">
-                <div class="brutal-product-main-image">
+    <main class="product-container">
+        <article class="product-detail">
+            <figure class="product-image-section">
+                <div class="product-main-image">
                     <!-- Fallback emoji based on category -->
-                    <span class="brutal-product-emoji">
+                    <span class="product-emoji">
                         {{#if (eq product.category "Fruits & Vegetables")}}🥬{{/if}}
                         {{#if (eq product.category "Bakery & Dairy")}}🥛{{/if}}
                         {{#if (eq product.category "Meat & Seafood")}}🐟{{/if}}
@@ -56,61 +56,61 @@
                 </div>
             </figure>
 
-            <div class="brutal-product-info-section" data-product-id="{{product.id}}" data-product-category="{{product.category}}">
-                <header class="brutal-product-header">
-                    <h2 class="brutal-product-title">{{product.name}}</h2>
+            <div class="product-info-section" data-product-id="{{product.id}}" data-product-category="{{product.category}}">
+                <header class="product-header">
+                    <h2 class="product-title">{{product.name}}</h2>
                     {{#if product.brand}}
-                        <p class="brutal-product-brand">BY {{product.brand}}</p>
+                        <p class="product-brand">BY {{product.brand}}</p>
                     {{/if}}
                     
-                    <div class="brutal-product-badges">
-                        <span class="brutal-category-badge">{{product.category}}</span>
+                    <div class="product-badges">
+                        <span class="category-badge">{{product.category}}</span>
                         {{#if product.subCategory}}
-                            <span class="brutal-subcategory-badge">{{product.subCategory}}</span>
+                            <span class="subcategory-badge">{{product.subCategory}}</span>
                         {{/if}}
                         {{#if product.type}}
-                            <span class="brutal-type-badge">{{product.type}}</span>
+                            <span class="type-badge">{{product.type}}</span>
                         {{/if}}
                     </div>
                 </header>
 
-            <section class="brutal-product-rating" aria-label="Product Rating">
+            <section class="product-rating" aria-label="Product Rating">
                     {{#if product.rating}}
-                        <div class="brutal-rating-stars">
+                        <div class="rating-stars">
                             {{#repeat product.rating}}⭐{{/repeat}}
-                            <span class="brutal-rating-text">{{product.rating}}/5</span>
+                            <span class="rating-text">{{product.rating}}/5</span>
                         </div>
                     {{/if}}
             </section>
 
-            <section class="brutal-product-pricing" aria-label="Pricing Information">
-                    <div class="brutal-price-section">
-                        <data class="brutal-current-price" value="{{product.salePrice}}">₹{{product.salePrice}}</data>
+            <section class="product-pricing" aria-label="Pricing Information">
+                    <div class="price-section">
+                        <data class="current-price" value="{{product.salePrice}}">₹{{product.salePrice}}</data>
                         
                     </div>
                     {{#if product.isOnSale}}
-                        <div class="brutal-sale-banner">🔥 ON SALE!</div>
+                        <div class="sale-banner">🔥 ON SALE!</div>
                     {{/if}}
             </section>
 
                 {{#if product.description}}
-                    <section class="brutal-product-description" aria-labelledby="description-heading">
+                    <section class="product-description" aria-labelledby="description-heading">
                         <h3 id="description-heading">DESCRIPTION</h3>
                         <p>{{product.description}}</p>
                     </section>
                 {{/if}}
 
-                <form class="brutal-product-actions" aria-label="Add to Cart">
-                    <fieldset class="brutal-quantity-section">
+                <form class="product-actions" aria-label="Add to Cart">
+                    <fieldset class="quantity-section">
                         <legend>QUANTITY:</legend>
-                        <div class="brutal-quantity-controls">
-                            <button type="button" class="brutal-quantity-btn" data-quantity-change="-1">-</button>
+                        <div class="quantity-controls">
+                            <button type="button" class="quantity-btn" data-quantity-change="-1">-</button>
                             <input type="number" id="quantity" value="1" min="1" max="10" aria-label="Quantity">
-                            <button type="button" class="brutal-quantity-btn" data-quantity-change="1">+</button>
+                            <button type="button" class="quantity-btn" data-quantity-change="1">+</button>
                         </div>
                     </fieldset>
                     
-                    <button type="submit" class="brutal-add-to-cart-btn">
+                    <button type="submit" class="add-to-cart-btn">
                         <i class="fas fa-shopping-cart"></i>
                         ADD TO CART
                     </button>
@@ -119,9 +119,9 @@
         </article>
 
         <!-- Related Products Section -->
-        <aside class="brutal-related-products" aria-labelledby="related-heading">
+        <aside class="related-products" aria-labelledby="related-heading">
             <h3 id="related-heading">YOU MIGHT ALSO LIKE</h3>
-            <div id="related-products-grid" class="brutal-products-grid" role="list">
+            <div id="related-products-grid" class="products-grid" role="list">
                 <!-- Related products will be loaded here -->
             </div>
         </aside>

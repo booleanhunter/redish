@@ -33,8 +33,8 @@ export class ChatMessage {
             ` : '';
 
             messageDiv.innerHTML = `
-                <div class="brutal-assistant-avatar">🤖</div>
-                <div class="brutal-message-content assistant-content">
+                <div class="assistant-avatar">🤖</div>
+                <div class="message-content assistant-content">
                     ${MessageFormatter.formatMessage(this.message)}
                     ${cacheIndicator}
                     <div class="message-time">${timestamp}</div>

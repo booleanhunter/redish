@@ -12,10 +12,10 @@ export const DOM_IDS = {
 };
 
 export const CSS_SELECTORS = {
-    BRUTAL_SEARCH_BAR: '.brutal-search-bar',
-    BRUTAL_MAIN_SEARCH: '.brutal-main-search',
-    BRUTAL_CART_COUNT: '.brutal-cart-count',
-    BRUTAL_CATEGORY_CARD: '.brutal-category-card',
-    BRUTAL_ADD_BTN: '.brutal-add-btn',
-    BRUTAL_SUGGESTION_BTN: '.brutal-suggestion-btn'
+    SEARCH_BAR: '.search-bar',
+    MAIN_SEARCH: '.main-search',
+    CART_COUNT: '.cart-count',
+    CATEGORY_CARD: '.category-card',
+    ADD_BTN: '.add-btn',
+    SUGGESTION_BTN: '.suggestion-btn'
 };

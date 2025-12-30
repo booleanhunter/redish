@@ -5,12 +5,12 @@ export class ProductCard {
     }
 
     init() {
-        const addBtns = document.querySelectorAll('.brutal-add-btn');
+        const addBtns = document.querySelectorAll('.add-btn');
         addBtns.forEach(btn => {
             btn.addEventListener('click', (e) => this.handleProductAdd(e));
         });
 
-        const categoryCards = document.querySelectorAll('.brutal-category-card');
+        const categoryCards = document.querySelectorAll('.category-card');
         categoryCards.forEach(card => {
             card.addEventListener('click', (e) => this.handleCategoryClick(e));
         });
@@ -18,7 +18,7 @@ export class ProductCard {
 
     handleProductAdd(e) {
         e.preventDefault();
-        const productCard = e.target.closest('.brutal-product-card');
+        const productCard = e.target.closest('.product-card');
         const productName = productCard.querySelector('h4').textContent;
 
         if (this.onProductAdd) {

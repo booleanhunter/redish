@@ -43,14 +43,14 @@ export class RelatedProducts {
         }
 
         this.grid.innerHTML = products.map(product => `
-            <div class="brutal-product-card" role="listitem">
-                <div class="brutal-product-image">
-                    <span class="brutal-product-emoji">${this.getCategoryEmoji(product.category)}</span>
+            <div class="product-card" role="listitem">
+                <div class="product-image">
+                    <span class="product-emoji">${this.getCategoryEmoji(product.category)}</span>
                 </div>
-                <div class="brutal-product-info">
+                <div class="product-info">
                     <h4>${product.name}</h4>
-                    <p class="brutal-product-price">₹${product.salePrice}</p>
-                    <a href="/products/${product.id}" class="brutal-view-btn">VIEW PRODUCT</a>
+                    <p class="product-price">₹${product.salePrice}</p>
+                    <a href="/products/${product.id}" class="view-btn">VIEW PRODUCT</a>
                 </div>
             </div>
         `).join('');
@@ -58,7 +58,7 @@ export class RelatedProducts {
 
     showPlaceholder() {
         this.grid.innerHTML = `
-            <div class="brutal-placeholder-message">
+            <div class="placeholder-message">
                 <p>Related products feature coming soon!</p>
             </div>
         `;

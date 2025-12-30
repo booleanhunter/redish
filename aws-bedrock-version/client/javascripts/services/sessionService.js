@@ -1,4 +1,4 @@
-import { endSession as endChatSession } from '../chatService.js';
+import { endSession as endChatSession } from './chatService.js';
 
 export class SessionService {
     constructor() {

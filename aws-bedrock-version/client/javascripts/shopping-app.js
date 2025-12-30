@@ -1,4 +1,4 @@
-import { sendChatMessage } from './chatService.js';
+import { sendChatMessage } from './services/chatService.js';
 import { DOM_IDS, CSS_SELECTORS } from './utils/constants.js';
 
 import { ChatWindow } from './components/chat/chat-window/chat-window.js';
@@ -31,7 +31,7 @@ export class ShoppingApp {
         this.sessionId = session.sessionId;
         this.currentChatId = session.currentChatId;
 
-        this.cartCount = new CartCount(CSS_SELECTORS.BRUTAL_CART_COUNT);
+        this.cartCount = new CartCount(CSS_SELECTORS.CART_COUNT);
         this.cartButton = new CartButton(
             (result) => this.handleCartSuccess(result),
             (error) => this.handleCartError(error)
@@ -60,8 +60,8 @@ export class ShoppingApp {
         );
 
         this.searchBar = new SearchBar(
-            CSS_SELECTORS.BRUTAL_SEARCH_BAR,
-            CSS_SELECTORS.BRUTAL_MAIN_SEARCH,
+            CSS_SELECTORS.SEARCH_BAR,
+            CSS_SELECTORS.MAIN_SEARCH,
             (query) => this.handleMainSearch(query)
         );
 
@@ -142,7 +142,7 @@ export class ShoppingApp {
         } else if (productName) {
             NotificationSystem.show(`${productName} added to cart! 🛒`);
 
-            const cartCountElement = document.querySelector(CSS_SELECTORS.BRUTAL_CART_COUNT);
+            const cartCountElement = document.querySelector(CSS_SELECTORS.CART_COUNT);
             if (cartCountElement) {
                 const currentCount = parseInt(cartCountElement.textContent) || 0;
                 cartCountElement.textContent = currentCount + 1;
