@@ -3,7 +3,7 @@
  * Usage: node scripts/debug-config.js
  */
 
-import CONFIG from '../config.js';
+import CONFIG from '#config';
 
 console.log('🔍 Configuration Debug Information\n');
 

@@ -1,5 +1,5 @@
 import ChatRepository from '../data/chat-repository.js';
-import { runShoppingAgentWorkflow } from '../../ai/agentic-shopping-workflow/index.js';
+import { runShoppingAgentWorkflow } from '#modules/ai/agentic-shopping-workflow/index.js';
 
 const chatRepository = new ChatRepository();
 

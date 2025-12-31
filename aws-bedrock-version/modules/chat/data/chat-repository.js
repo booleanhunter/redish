@@ -2,7 +2,7 @@ import { LangCache } from "@redis-ai/langcache";
 import { SearchStrategy } from '@redis-ai/langcache/models/searchstrategy.js';
 import { getRedisClient } from '../../db/redis-client.js';
 
-import CONFIG from '../../../config.js';
+import CONFIG from '#config';
 
 // Initialize LangCache client
 const langCache = new LangCache({

@@ -1,4 +1,4 @@
-import { loadCartCount } from '../../services/cartService.js';
+import { loadCartCount } from '@services/cartService.js';
 
 export class CartCount {
     constructor(selector = '.cart-count') {

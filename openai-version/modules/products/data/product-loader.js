@@ -2,9 +2,9 @@ import { createClient, SCHEMA_FIELD_TYPE, SCHEMA_VECTOR_FIELD_ALGORITHM } from '
 
 import { readFileSync } from 'fs';
 import { parse } from 'csv-parse/sync';
-import CONFIG from '../../../config.js';
+import CONFIG from '#config';
 
-import { generateEmbeddings } from '../../ai/helpers/embeddings.js';
+import { generateEmbeddings } from '#modules/ai/helpers/embeddings.js';
 
 const client = await createClient({
     url: CONFIG.redisUrl,

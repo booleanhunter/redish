@@ -1,4 +1,4 @@
-import { SessionService } from '../../services/sessionService.js';
+import { SessionService } from '@services/sessionService.js';
 
 export class SessionManager {
     constructor(onSessionEnd = null, onNewChat = null) {

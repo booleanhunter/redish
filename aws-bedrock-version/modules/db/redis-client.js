@@ -1,5 +1,5 @@
 import { createClient } from 'redis';
-import CONFIG from '../../config.js';
+import CONFIG from '#config';
 
 let client = null;
 

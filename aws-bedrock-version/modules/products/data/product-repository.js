@@ -1,4 +1,4 @@
-import CONFIG from '../../../config.js';
+import CONFIG from '#config';
 import { getRedisClient } from '../../db/redis-client.js';
 
 export default class ProductRepository {

@@ -1,4 +1,4 @@
-import { addToCart } from '../../services/cartService.js';
+import { addToCart } from '@services/cartService.js';
 
 export class CartButton {
     constructor(onSuccess = null, onError = null) {

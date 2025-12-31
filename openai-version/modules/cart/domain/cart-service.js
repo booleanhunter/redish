@@ -1,5 +1,5 @@
 import CartRepository from '../data/cart-repository.js';
-import ProductRepository from '../../products/data/product-repository.js';
+import ProductRepository from '#modules/products/data/product-repository.js';
 
 const cartRepository = new CartRepository();
 const productRepository = new ProductRepository();

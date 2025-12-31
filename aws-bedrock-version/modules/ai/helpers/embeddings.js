@@ -1,5 +1,5 @@
 import { BedrockEmbeddings } from '@langchain/aws';
-import CONFIG from '../../../config.js';
+import CONFIG from '#config';
 
 const embeddings = new BedrockEmbeddings({
     model: "amazon.titan-embed-text-v2:0",

@@ -5,12 +5,12 @@ import { ChatBedrockConverse } from "@langchain/aws";
 import { z } from "zod";
 
 // Import service functions
-import { findProductsForIngredients, searchProducts } from '../../products/domain/product-service.js';
-import { addItemsToCart, getCart, clearCart } from '../../cart/domain/cart-service.js';
+import { findProductsForIngredients, searchProducts } from '#modules/products/domain/product-service.js';
+import { addItemsToCart, getCart, clearCart } from '#modules/cart/domain/cart-service.js';
 
 // Import helper functions
-import { AppError, HttpStatusCode } from '../../../lib/errors.js';
-import CONFIG from '../../../config.js';
+import { AppError, HttpStatusCode } from '#lib/errors.js';
+import CONFIG from '#config';
 
 /**
  * Extract ingredients from LLM for a recipe

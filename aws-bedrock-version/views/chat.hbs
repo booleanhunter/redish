@@ -25,6 +25,17 @@
     <meta property="og:title" content="{{app_name}} - Fresh Groceries Online">
     <meta property="og:description" content="Fresh groceries delivered to your door with AI shopping assistant.">
     <meta property="og:image" content="https://github.com/booleanhunter/redibuddy/raw/main/images/redis-avatar.png">
+
+    <!-- Import Maps for Client-Side Module Resolution -->
+    <script type="importmap">
+    {
+        "imports": {
+            "@components/": "/javascripts/components/",
+            "@services/": "/javascripts/services/",
+            "@utils/": "/javascripts/utils/"
+        }
+    }
+    </script>
 </head>
 <body class="neo-brutalist-theme">
     <!-- Main Shopping Website -->
@@ -220,7 +231,7 @@
         </div>
     </div>
 
-    <script src="/javascripts/index.js" type="module"></script>
+    <script src="/javascripts/home-page.js" type="module"></script>
     
 </body>
 </html>

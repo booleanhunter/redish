@@ -1,13 +1,13 @@
-import { SessionService } from './services/sessionService.js';
-import { addToCart } from './services/cartService.js';
+import { SessionService } from '@services/sessionService.js';
+import { addToCart } from '@services/cartService.js';
 
-import { CartCount } from './components/cart/cart-count.js';
-import { CartButton } from './components/cart/cart-button.js';
+import { CartCount } from '@components/cart/cart-count.js';
+import { CartButton } from '@components/cart/cart-button.js';
 
-import { NotificationSystem } from './components/notifications/notification-system.js';
+import { NotificationSystem } from '@components/notifications/notification-system.js';
 
-import { ProductQuantity } from './components/products/product-quantity.js';
-import { RelatedProducts } from './components/products/related-products.js';
+import { ProductQuantity } from '@components/products/product-quantity.js';
+import { RelatedProducts } from '@components/products/related-products.js';
 
 export class ProductApp {
     constructor(productId, productCategory) {
@@ -121,3 +121,16 @@ export class ProductApp {
         NotificationSystem.error('❌ Failed to add to cart. Please try again.');
     }
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Extract product info from page
+    const productId = document.querySelector('[data-product-id]')?.dataset.productId ||
+                     new URLSearchParams(window.location.search).get('productId') ||
+                     window.location.pathname.split('/').pop();
+
+    const productCategory = document.querySelector('[data-product-category]')?.dataset.productCategory;
+
+    // Initialize the product app
+    window.productApp = new ProductApp(productId, productCategory);
+});

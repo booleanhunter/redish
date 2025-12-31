@@ -15,6 +15,17 @@
     <meta name="description" content="{{product.description}}">
     <meta property="og:title" content="{{product.name}} - {{app_name}}">
     <meta property="og:description" content="{{product.description}}">
+
+    <!-- Import Maps for Client-Side Module Resolution -->
+    <script type="importmap">
+    {
+        "imports": {
+            "@components/": "/javascripts/components/",
+            "@services/": "/javascripts/services/",
+            "@utils/": "/javascripts/utils/"
+        }
+    }
+    </script>
 </head>
 <body class="neo-brutalist-theme">
     <!-- Header -->
@@ -130,6 +141,6 @@
     <!-- Success/Error Messages -->
     <div id="notification-container"></div>
 
-    <script src="/javascripts/index-product.js" type="module"></script>
+    <script src="/javascripts/product-details-page.js" type="module"></script>
 </body>
 </html>

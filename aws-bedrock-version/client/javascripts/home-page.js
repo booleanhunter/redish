@@ -1,18 +1,18 @@
-import { sendChatMessage } from './services/chatService.js';
-import { DOM_IDS, CSS_SELECTORS } from './utils/constants.js';
+import { sendChatMessage } from '@services/chatService.js';
+import { DOM_IDS, CSS_SELECTORS } from '@utils/constants.js';
 
-import { ChatWindow } from './components/chat/chat-window/chat-window.js';
-import { ChatInput } from './components/chat/chat-input/chat-input.js';
-import { SuggestionButtons } from './components/chat/chat-input/suggestion-buttons.js';
-import { ChatToggle } from './components/chat/chat-toggle.js';
+import { ChatWindow } from '@components/chat/chat-window/chat-window.js';
+import { ChatInput } from '@components/chat/chat-input/chat-input.js';
+import { SuggestionButtons } from '@components/chat/chat-input/suggestion-buttons.js';
+import { ChatToggle } from '@components/chat/chat-toggle.js';
 
-import { CartCount } from './components/cart/cart-count.js';
-import { CartButton } from './components/cart/cart-button.js';
+import { CartCount } from '@components/cart/cart-count.js';
+import { CartButton } from '@components/cart/cart-button.js';
 
-import { SearchBar } from './components/search/search-bar.js';
-import { ProductCard } from './components/products/product-card.js';
-import { NotificationSystem } from './components/notifications/notification-system.js';
-import { SessionManager } from './components/session/session-manager.js';
+import { SearchBar } from '@components/search/search-bar.js';
+import { ProductCard } from '@components/products/product-card.js';
+import { NotificationSystem } from '@components/notifications/notification-system.js';
+import { SessionManager } from '@components/session/session-manager.js';
 
 export class ShoppingApp {
     constructor() {
@@ -150,3 +150,8 @@ export class ShoppingApp {
         }
     }
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    window.shoppingApp = new ShoppingApp();
+});
